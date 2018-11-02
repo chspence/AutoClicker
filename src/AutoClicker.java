@@ -2,18 +2,26 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
 
+import org.omg.CORBA.INITIALIZE;
+
 public class AutoClicker {
 
-	public static void main(String[] args) {
-		try {
-			Robot robot = new Robot();
-			robot.delay(3000);
-			robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-	        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-			
-		} catch (AWTException e) {
-			e.printStackTrace();
-		}
+	AutoClickerMvp.Model model;
+	AutoClickerMvp.View view;
+	AutoClickerMvp.Presenter presenter;
+	
+	public AutoClicker() {
+		initializeMvp();
 	}
-
+	
+	private void initializeMvp() {
+		this.model = new AutoClickerModel();
+		this.view = new AutoClickerView();
+		this.presenter = new AutoClickerPresenter();
+	}
+	
+	public static void main(String[] args) {
+		
+	}
+	
 }
