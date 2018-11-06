@@ -1,26 +1,26 @@
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.text.NumberFormatter;
+
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 import java.awt.GridBagConstraints;
-import javax.swing.JTextField;
-
-import sun.misc.JavaxCryptoSealedObjectAccess;
 
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.NumberFormat;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JButton;
 
+@SuppressWarnings("serial")
 public class AutoClickerView extends JFrame implements AutoClickerMvp.View {
 
 	private AutoClickerMvp.Presenter presenter;
 	
-	private JFormattedTextField interval;
+	private JFormattedTextField delay;
 	private JButton btnStart;
 	private JButton btnStop;
 	
@@ -34,8 +34,28 @@ public class AutoClickerView extends JFrame implements AutoClickerMvp.View {
 	}
 	
 	@Override
-	public int getInterval() {
-		return (int) interval.getValue();
+	public int getDelay() {
+		return (Integer)delay.getValue();
+	}
+	
+	@Override
+	public void setDelayEnabled(boolean enabled) {
+		delay.setEnabled(enabled);
+	}
+	
+	@Override
+	public void setStartButtonEnabled(boolean enabled) {
+		btnStart.setEnabled(enabled);
+	}
+
+	@Override
+	public void setStopButtonEnabled(boolean enabled) {
+		btnStop.setEnabled(enabled);
+	}
+
+	@Override
+	public void setViewAlwaysOnTop(boolean alwaysOnTop) {
+		this.setAlwaysOnTop(alwaysOnTop);
 	}
 	
 	private void initializeView() {
@@ -51,22 +71,28 @@ public class AutoClickerView extends JFrame implements AutoClickerMvp.View {
 		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 		
-		JLabel lblInterval = new JLabel("Interval (ms)");
-		GridBagConstraints gbc_lblInterval = new GridBagConstraints();
-		gbc_lblInterval.fill = GridBagConstraints.VERTICAL;
-		gbc_lblInterval.insets = new Insets(0, 0, 5, 0);
-		gbc_lblInterval.gridx = 0;
-		gbc_lblInterval.gridy = 0;
-		panel.add(lblInterval, gbc_lblInterval);
+		JLabel lblDelay = new JLabel("Delay (ms)");
+		GridBagConstraints gbc_lblDelay = new GridBagConstraints();
+		gbc_lblDelay.fill = GridBagConstraints.VERTICAL;
+		gbc_lblDelay.insets = new Insets(0, 0, 5, 0);
+		gbc_lblDelay.gridx = 0;
+		gbc_lblDelay.gridy = 0;
+		panel.add(lblDelay, gbc_lblDelay);
 		
-		JFormattedTextField interval = new JFormattedTextField(NumberFormat.getIntegerInstance());
-		GridBagConstraints gbc_interval = new GridBagConstraints();
-		gbc_interval.insets = new Insets(0, 0, 5, 0);
-		gbc_interval.fill = GridBagConstraints.BOTH;
-		gbc_interval.gridx = 0;
-		gbc_interval.gridy = 1;
-		panel.add(interval, gbc_interval);
-		this.interval = interval;
+		NumberFormatter delayFormatter = new NumberFormatter();
+		delayFormatter.setValueClass(Integer.class);
+		delayFormatter.setAllowsInvalid(false);
+		delayFormatter.setMinimum(new Integer(0));
+		delayFormatter.setMaximum(new Integer(100000));
+		JFormattedTextField delay = new JFormattedTextField(delayFormatter);
+		delay.setValue(1000);
+		GridBagConstraints gbc_delay = new GridBagConstraints();
+		gbc_delay.insets = new Insets(0, 0, 5, 0);
+		gbc_delay.fill = GridBagConstraints.BOTH;
+		gbc_delay.gridx = 0;
+		gbc_delay.gridy = 1;
+		panel.add(delay, gbc_delay);
+		this.delay = delay;
 		
 		JButton btnStart = new JButton("Start");
 		btnStart.addActionListener(new ActionListener() {
@@ -84,6 +110,7 @@ public class AutoClickerView extends JFrame implements AutoClickerMvp.View {
 		this.btnStart = btnStart;
 		
 		JButton btnStop = new JButton("Stop");
+		btnStop.setEnabled(false);
 		btnStop.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -97,7 +124,9 @@ public class AutoClickerView extends JFrame implements AutoClickerMvp.View {
 		panel.add(btnStop, gbc_btnStop);
 		this.btnStop = btnStop;
 		
+		this.setContentPane(panel);
+		this.pack();
 		setVisible(true);
 	}
-	
+
 }

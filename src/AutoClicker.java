@@ -1,9 +1,3 @@
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.event.InputEvent;
-
-import org.omg.CORBA.INITIALIZE;
-
 public class AutoClicker {
 
 	AutoClickerMvp.Model model;
@@ -15,13 +9,15 @@ public class AutoClicker {
 	}
 	
 	private void initializeMvp() {
-		this.model = new AutoClickerModel();
-		this.view = new AutoClickerView();
-		this.presenter = new AutoClickerPresenter();
+		model = new AutoClickerModel();
+		view = new AutoClickerView();
+		presenter = new AutoClickerPresenter();
+		presenter.setModel(model);
+		presenter.setView(view);
 	}
 	
 	public static void main(String[] args) {
-		
+		new AutoClicker();
 	}
 	
 }

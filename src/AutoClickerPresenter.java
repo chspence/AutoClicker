@@ -1,6 +1,3 @@
-import AutoClickerMvp.Model;
-import AutoClickerMvp.View;
-
 public class AutoClickerPresenter implements AutoClickerMvp.Presenter {
 
 	private AutoClickerMvp.Model model;
@@ -14,16 +11,48 @@ public class AutoClickerPresenter implements AutoClickerMvp.Presenter {
 	@Override
 	public void setView(AutoClickerMvp.View view) {
 		this.view = view;
+		this.view.setPresenter(this);
 	}
 	
 	@Override
 	public void onStartButtonClicked() {
-		model.
+		model.setDelay(view.getDelay());
+		model.startClicking(new SuccessCallback() {
+			
+			@Override
+			public void onSuccess() {
+				view.setStartButtonEnabled(false);
+				view.setStopButtonEnabled(true);
+				view.setDelayEnabled(false);
+				view.setViewAlwaysOnTop(true);
+			}
+			
+			@Override
+			public void onFail() {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 
 	@Override
 	public void onStopButtonClicked() {
-		
+		model.stopClicking(new SuccessCallback() {
+			
+			@Override
+			public void onSuccess() {
+				view.setStopButtonEnabled(false);
+				view.setStartButtonEnabled(true);
+				view.setDelayEnabled(true);
+				view.setViewAlwaysOnTop(false);
+			}
+			
+			@Override
+			public void onFail() {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 
 }

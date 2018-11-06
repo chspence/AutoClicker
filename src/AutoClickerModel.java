@@ -1,10 +1,12 @@
 import java.awt.AWTException;
 import java.awt.Robot;
+import java.awt.event.InputEvent;
 
 public class AutoClickerModel implements AutoClickerMvp.Model {
 
+	private Thread currentClickingThread;
 	private Robot robot;
-	private int interval;
+	private int delay;
 	private boolean isClicking;
 		
 	public AutoClickerModel() {
@@ -12,7 +14,6 @@ public class AutoClickerModel implements AutoClickerMvp.Model {
 	}
 	
 	private void initializeRobot() {
-		
 		Robot robot = null;
 		
 		try {
@@ -25,29 +26,56 @@ public class AutoClickerModel implements AutoClickerMvp.Model {
 	}
 
 	@Override
-	public void setInterval(int interval) {
-		this.interval = interval;
-	}
-
-	@Override
-	public void startClicking() {
-		
+	public void setDelay(int delay) {
+		//Disallow interacting with current clicking instance
 		if(isClicking) return;
 		
-		while(isClicking) {
-			robot.dela //robot is sleeping bt main thread isnt -> backlog of calls this has to be synced up
-			robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-			robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-		}
+		this.delay = delay;
 	}
 
 	@Override
-	public void stopClicking() {
-		// TODO Auto-generated method stub
+	public void startClicking(SuccessCallback callback) {
+		//Validate single clicking instance enforced
+		if(isClicking) return;
+		isClicking = true;
 		
+		//Successful Start callback
+		callback.onSuccess();
+		
+		currentClickingThread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				while(isClicking) {
+					robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+					robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+					robot.delay(delay);
+//					try {
+//						Thread.sleep(delay);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+				}
+			}
+		});
+		currentClickingThread.start();
+			
 	}
-	
-	
-	//robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-	
+
+	@Override
+	public void stopClicking(SuccessCallback callback) {
+		//Validate single clicking instance enforced
+		if(!isClicking) return;
+		isClicking = false;
+		
+		//Wait for currentClickingThread to end
+		try {
+			currentClickingThread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		//Successful Stop callback
+		callback.onSuccess();
+	}
 }
